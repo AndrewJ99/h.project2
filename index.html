@@ -16,6 +16,56 @@
             --radius: 4px;
             --transition: 0.3s;
         }
+        
+        /* Intro Screen */
+        .intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 1s ease;
+            cursor: pointer;
+        }
+        
+        .intro-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .intro-title {
+            font-size: 15vw;
+            font-weight: 900;
+            color: white;
+            text-align: center;
+            letter-spacing: 0.05em;
+            line-height: 1;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        .intro-subtitle {
+            position: absolute;
+            bottom: 40px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            text-align: center;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
 
         * {
             box-sizing: border-box;
@@ -268,9 +318,16 @@
     </style>
 </head>
 <body>
+
+    <!-- Intro screen -->
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-title">A+B</div>
+        <div class="intro-subtitle">press to continue</div>
+    </div>
+
     <div id="loading" class="loading">
         <div class="spinner"></div>
-        <p>Loading your memories...</p>
+        <p>Loading memories...</p>
     </div>
     
     <div class="grid-container" id="imageGrid"></div>
@@ -296,308 +353,308 @@
             {
                 filename: "1.jpg",
                 date: "August 11, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "HELLO",
+                description: "haven city"
             },
             {
                 filename: "2.jpg",
                 date: "November 28, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "cute girl in grandma sweater ",
+                description: "quick photoshoot before our first flight out of state together (vegas)."
             },
             {
                 filename: "3.jpg",
                 date: "November 28, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "Such a swag girl",
+                description: ":)"
             },
             {
                 filename: "4.jpg",
                 date: "November 28, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: ":O",
+                description: ""
             },
             {
                 filename: "5.jpg",
                 date: "November 28, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "Making sure she got her ID...",
+                description: "FIRST FLIGHT TOGETHER"
             },
             {
                 filename: "6.jpg",
                 date: "November 29, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "Cheesing before the flight to LV",
+                description: "ONT AIRPORT"
             },
             {
                 filename: "7.jpg",
                 date: "November 29, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "swag",
+                description: ""
             },
             {
                 filename: "8.jpg",
                 date: "November 29, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "visibly tired",
+                description: "last night was a movie"
             },
             {
                 filename: "9.jpg",
                 date: "November 29, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "LV",
+                description: "us after listening to 2019 dj club mix on youtube"
             },
             {
                 filename: "10.jpg",
                 date: "November 29, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "LAS VEGAS TRIP",
+                description: "We was drunk here lol."
             },
             {
                 filename: "11.jpg",
                 date: "November 29, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "LAS VEGAS TRIP",
+                description: ""
             },
             {
                 filename: "12.jpg",
                 date: "November 30, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "pretty girl",
+                description: "u almost out shined the christmas tree"
             },
             {
                 filename: "13.jpg",
                 date: "November 30, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "ANOTHER SELFIE FROM OUR YEARLY CHRISTMAS LIGHTS DATE",
+                description: "i just noticed how many photos from this day is in this memory grid.. lol"
             },
             {
                 filename: "14.jpg",
                 date: "November 30, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "happy",
+                description: ""
             },
             {
                 filename: "15.jpg",
                 date: "November 30, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "CHRISTMAS LIGHTS DATE",
+                description: "this our yearly thing..."
             },
             {
                 filename: "16.jpg",
                 date: "November 30, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "Our lil yearly Christmas lights date",
+                description: "i made that chandelier my album pic for jime lol."
             },
             {
                 filename: "17.jpg",
                 date: "December 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: ":D :) :P",
+                description: "lau cameo"
             },
             {
                 filename: "18.jpg",
                 date: "December 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: ":X",
+                description: ""
             },
             {
                 filename: "19.jpg",
                 date: "December 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "ISOKNOCK",
+                description: "very swag and fun concert"
             },
             {
                 filename: "20.jpg",
                 date: "December 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "",
+                description: ""
             },
             {
                 filename: "21.jpg",
                 date: "December 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "ISOKNOCK4EVA",
+                description: "W concert"
             },
             {
                 filename: "22.jpg",
                 date: "December 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "ISOKNOCK GROUP PIC",
+                description: ""
             },
             {
                 filename: "23.jpg",
                 date: "June 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "COFFEE!",
+                description: "in the morning before baby greyson's baptismal!"
             },
             {
                 filename: "24.jpg",
                 date: "June 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: ":) :)",
+                description: ""
             },
             {
                 filename: "25.jpg",
                 date: "June 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "Mom & Dad Selfie",
+                description: ""
             },
             {
                 filename: "26.jpg",
                 date: "June 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "Pretty girl",
+                description: ""
             },
             {
                 filename: "27.jpg",
                 date: "February 21, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "LAKE TAHOE TRIP",
+                description: "this was fun, the boys went fishing while the girls went to john summit day party"
             },
             {
                 filename: "28.jpg",
                 date: "March 07, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: ":) (danny's bday)",
+                description: "love being your partner"
             },
             {
                 filename: "29.jpg",
                 date: "February 22, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "snowboarding together!",
+                description: "it may have taken us 3 hours to get down but it was one of the best memories we have together :)"
             },
             {
                 filename: "30.jpg",
                 date: "May 19, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "1st Year Anniversary Trip",
+                description: "SD"
             },
             {
                 filename: "31.jpg",
                 date: "May 19, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "Anniversary Dinner <3",
+                description: "stunning..."
             },
             {
                 filename: "32.jpg",
                 date: "May 20, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "PhotoBooth Pics",
+                description: "San Diego Zoo PHOTO BOOTH"
             },
             {
                 filename: "33.jpg",
                 date: "May 20, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "SD ZOO",
+                description: "the bird cage was awesome, and also the lions."
             },
             {
                 filename: "34.jpg",
                 date: "June 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "hehe",
+                description: ""
             },
             {
                 filename: "35.jpg",
                 date: "August 04, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "OC FAIR?",
+                description: "we just ate tacos before this pic, also Bri loves all the pickle stuff"
             },
             {
                 filename: "36.jpg",
                 date: "September 06, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "My home remedy",
+                description: "beautiful girl brought me some snacks :) (this was before my AWS exam)"
             },
             {
                 filename: "37.jpg",
                 date: "October 18, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "DOM DOLLA?",
+                description: "i thought dom dolla was fruity but he's just aussie"
             },
             {
                 filename: "38.jpg",
                 date: "October 18, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "After Dom Dolla",
+                description: "we took the metro back home fr"
             },
             {
                 filename: "39.jpg",
                 date: "November 17, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "Date Day at THE CAMP",
+                description: "very swag girl behind the camera who took pics of very swag boy."
             },
             {
                 filename: "40.jpg",
                 date: "December 08, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "at church",
+                description: "had proof i went"
             },
             {
                 filename: "41.jpg",
                 date: "December 22, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "DRUNK AFTER OUR CHRISTMAS PARTY",
+                description: "i was very drunk i honestly dont remember this pic, but damn you look good"
             },
             {
                 filename: "42.jpg",
                 date: "January 12, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "small date at the viet fest",
+                description: "happy new years!"
             },
             {
                 filename: "43.jpg",
                 date: "January 26, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "Chúc mừng năm mới",
+                description: ""
             },
             {
                 filename: "44.jpg",
                 date: "February 09, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "Our lady of Mt Carmel",
+                description: "why we always throwing thumbs up during our church pics? lmaoo."
             },
             {
                 filename: "45.jpg",
                 date: "February 21, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "",
+                description: ""
             },
             {
                 filename: "46.jpg",
                 date: "March 16, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "ROLLING LOUD",
+                description: "WE SAW CARTI, SEEYUHH, BIG GLAZE, THATS OUR GOAT."
             },
             {
                 filename: "47.jpg",
                 date: "May 17, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "<3>",
+                description: ""
             },
             {
                 filename: "48.jpg",
                 date: "April 11, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "FIRST COACHELLA (andoy)",
+                description: "it was very hot, but yeat was 10/10"
             },
             {
                 filename: "49.jpg",
                 date: "April 13, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "COACHELLA DAY3",
+                description: "I got really drunk this day... lol i love you"
             },
             {
                 filename: "50.jpg",
                 date: "April 23, 2025",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "i love u",
+                description: "soup? nah boiling crab"
             },
             {
                 filename: "51.jpg",
                 date: "February 06, 2024",
-                title: "Your Title Here",
-                description: "Your description goes here. Add a sentence or two describing the image."
+                title: "KBBQ WITH MANO PO",
+                description: "love this photo"
             },
         ];
 
@@ -619,9 +676,49 @@
 
         // Initialize app when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            initializeGrid();
-            setupEventListeners();
+            setupIntroScreen();
         });
+
+        // Set up intro screen
+        function setupIntroScreen() {
+            const introScreen = document.getElementById('introScreen');
+            
+            // Hide content initially
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('imageGrid').style.display = 'none';
+            
+            // Listen for click on intro screen
+            introScreen.addEventListener('click', dismissIntro);
+            // Also listen for any keypress
+            document.addEventListener('keydown', dismissIntro);
+        }
+        
+        // Dismiss intro screen and start app
+        function dismissIntro() {
+            // Only run once
+            if (!document.getElementById('introScreen')) return;
+            
+            const introScreen = document.getElementById('introScreen');
+            introScreen.classList.add('hidden');
+            
+            // Remove event listeners
+            introScreen.removeEventListener('click', dismissIntro);
+            document.removeEventListener('keydown', dismissIntro);
+            
+            // Start loading the actual content
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('imageGrid').style.display = 'grid';
+                initializeGrid();
+                setupEventListeners();
+                
+                // Finally remove the intro screen from DOM after transition
+                setTimeout(() => {
+                    introScreen.remove();
+                }, 1000);
+            }, 500);
+        }
+
 
         // Initialize the grid
         function initializeGrid() {
