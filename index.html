@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Memory Grid</title>
+    <style>
+        :root {
+            --bg-color: #000;
+            --card-bg: #222;
+            --card-info-bg: #333;
+            --img-bg: #444;
+            --text-color: #fff;
+            --text-secondary: #ddd;
+            --text-muted: #aaa;
+            --radius: 4px;
+            --transition: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .image-item {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background-color: var(--img-bg);
+            border-radius: var(--radius);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition) ease;
+        }
+
+        .image-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Card Detail */
+        .card-detail {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            width: 80vw;
+            max-width: 900px;
+            height: 80vh;
+            max-height: 650px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition) ease;
+            overflow: hidden;
+        }
+
+        .card-detail.visible {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .card-image {
+            flex: 1;
+            background-color: var(--card-info-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .card-info {
+            padding: 20px;
+            background-color: var(--card-info-bg);
+        }
+
+        .card-date {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .card-description {
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 32px;
+            height: 32px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 101;
+            transition: background-color 0.2s ease;
+        }
+
+        .close-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 90;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition) ease;
+            backdrop-filter: blur(3px);
+        }
+
+        .overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #esc-instruction {
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: white;
+            z-index: 9999;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 6px 12px;
+            border-radius: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        #esc-instruction.visible {
+            opacity: 0.8;
+            visibility: visible;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--text-muted);
+            z-index: 1000;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 12px;
+                padding: 15px;
+            }
+            
+            .card-detail {
+                width: 90vw;
+                height: 85vh;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 12px;
+            }
+            
+            .card-detail {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+                max-width: none;
+                max-height: none;
+            }
+            
+            .card-info {
+                padding: 15px;
+            }
+            
+            .card-title {
+                font-size: 18px;
+            }
+            
+            .card-description {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading your memories...</p>
+    </div>
+    
+    <div class="grid-container" id="imageGrid"></div>
+    
+    <div class="card-detail" id="cardDetail">
+        <div class="close-button" id="closeButton">×</div>
+        <div class="card-image">
+            <img id="cardImg" src="" alt="Detailed view">
+        </div>
+        <div class="card-info">
+            <div class="card-date" id="cardDate"></div>
+            <div class="card-title" id="cardTitle"></div>
+            <div class="card-description" id="cardDescription"></div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div id="esc-instruction">Press ESC to close</div>
+
+    <script>
+
+        const imageDatabase = [
+            {
+                filename: "1.jpg",
+                date: "August 11, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "2.jpg",
+                date: "November 28, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "3.jpg",
+                date: "November 28, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "4.jpg",
+                date: "November 28, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "5.jpg",
+                date: "November 28, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "6.jpg",
+                date: "November 29, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "7.jpg",
+                date: "November 29, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "8.jpg",
+                date: "November 29, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "9.jpg",
+                date: "November 29, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "10.jpg",
+                date: "November 29, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "11.jpg",
+                date: "November 29, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "12.jpg",
+                date: "November 30, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "13.jpg",
+                date: "November 30, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "14.jpg",
+                date: "November 30, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "15.jpg",
+                date: "November 30, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "16.jpg",
+                date: "November 30, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "17.jpg",
+                date: "December 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "18.jpg",
+                date: "December 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "19.jpg",
+                date: "December 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "20.jpg",
+                date: "December 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "21.jpg",
+                date: "December 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "22.jpg",
+                date: "December 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "23.jpg",
+                date: "June 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "24.jpg",
+                date: "June 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "25.jpg",
+                date: "June 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "26.jpg",
+                date: "June 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "27.jpg",
+                date: "February 21, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "28.jpg",
+                date: "March 07, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "29.jpg",
+                date: "February 22, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "30.jpg",
+                date: "May 19, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "31.jpg",
+                date: "May 19, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "32.jpg",
+                date: "May 20, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "33.jpg",
+                date: "May 20, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "34.jpg",
+                date: "June 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "35.jpg",
+                date: "August 04, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "36.jpg",
+                date: "September 06, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "37.jpg",
+                date: "October 18, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "38.jpg",
+                date: "October 18, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "39.jpg",
+                date: "November 17, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "40.jpg",
+                date: "December 08, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "41.jpg",
+                date: "December 22, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "42.jpg",
+                date: "January 12, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "43.jpg",
+                date: "January 26, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "44.jpg",
+                date: "February 09, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "45.jpg",
+                date: "February 21, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "46.jpg",
+                date: "March 16, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "47.jpg",
+                date: "May 17, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "48.jpg",
+                date: "April 11, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "49.jpg",
+                date: "April 13, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "50.jpg",
+                date: "April 23, 2025",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+            {
+                filename: "51.jpg",
+                date: "February 06, 2024",
+                title: "Your Title Here",
+                description: "Your description goes here. Add a sentence or two describing the image."
+            },
+        ];
+
+
+        // Configuration
+        const config = {
+            imageFolder: "imgs/",
+            animationDelay: 50, // ms between each image animation
+            imageRevealThreshold: 0.1 // how much of image needs to be visible
+        };
+
+        // App state
+        const state = {
+            isCardVisible: false,
+            loadedImages: 0,
+            totalImages: 0,
+            currentImageElement: null
+        };
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGrid();
+            setupEventListeners();
+        });
+
+        // Initialize the grid
+        function initializeGrid() {
+            const grid = document.getElementById('imageGrid');
+            grid.innerHTML = '';
+            
+            // Shuffle image database for randomized display
+            const shuffledImages = [...imageDatabase].sort(() => Math.random() - 0.5);
+            state.totalImages = shuffledImages.length;
+            
+            // Create all image items
+            shuffledImages.forEach((imageData, index) => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-item';
+                imageItem.dataset.index = index;
+                
+                // Create image element with lazy loading
+                const img = document.createElement('img');
+                img.src = config.imageFolder + imageData.filename;
+                img.alt = imageData.title || 'Photo';
+                img.loading = "lazy";
+                
+                // Handle image load events
+                img.onload = () => handleImageLoaded();
+                img.onerror = () => {
+                    handleImageLoaded();
+                    img.src = createPlaceholderSrc(imageData.title || "Image not found");
+                };
+                
+                // Store image metadata for quick access
+                imageItem.dataset.title = imageData.title || '';
+                imageItem.dataset.date = imageData.date || '';
+                imageItem.dataset.description = imageData.description || '';
+                imageItem.dataset.imageSrc = config.imageFolder + imageData.filename;
+                
+                imageItem.appendChild(img);
+                grid.appendChild(imageItem);
+                
+                // Add click event to show details
+                imageItem.addEventListener('click', () => showCardDetail(imageItem));
+            });
+            
+            // Set up intersection observer for animations
+            setupIntersectionObserver();
+        }
+
+        // Handle successfully loaded image
+        function handleImageLoaded() {
+            state.loadedImages++;
+            
+            // If enough images are loaded, hide loading screen
+            if (state.loadedImages >= Math.min(10, state.totalImages * 0.3)) { 
+                document.getElementById('loading').style.display = 'none';
+                
+                // Start revealing images with staggered delay
+                const items = document.querySelectorAll('.image-item');
+                items.forEach((item, i) => {
+                    setTimeout(() => {
+                        item.classList.add('visible');
+                    }, i * config.animationDelay);
+                });
+            }
+        }
+
+        // Create a placeholder image when real image fails to load
+        function createPlaceholderSrc(text) {
+            return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%23555'/%3E%3Ctext x='60' y='60' font-family='Arial' font-size='12' fill='white' text-anchor='middle' dominant-baseline='middle'%3E${encodeURIComponent(text.substring(0, 15))}%3C/text%3E%3C/svg%3E`;
+        }
+
+        // Set up intersection observer for animating images as they scroll into view
+        function setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: config.imageRevealThreshold,
+                rootMargin: '0px 0px 50px 0px' // Start loading before they come into view
+            });
+            
+            document.querySelectorAll('.image-item').forEach(item => {
+                observer.observe(item);
+            });
+        }
+
+        // Show card detail view
+        function showCardDetail(imageElement) {
+            state.currentImageElement = imageElement;
+            state.isCardVisible = true;
+            
+            const cardDetail = document.getElementById('cardDetail');
+            const overlay = document.getElementById('overlay');
+            const escInstruction = document.getElementById('esc-instruction');
+            const cardImg = document.getElementById('cardImg');
+            
+            // Set card content
+            cardImg.src = imageElement.dataset.imageSrc;
+            cardImg.alt = imageElement.dataset.title;
+            document.getElementById('cardDate').textContent = imageElement.dataset.date;
+            document.getElementById('cardTitle').textContent = imageElement.dataset.title;
+            document.getElementById('cardDescription').textContent = imageElement.dataset.description;
+            
+            cardImg.onerror = function() {
+                this.src = createPlaceholderSrc(imageElement.dataset.title || "Image not found");
+            };
+            
+            // Show UI elements
+            cardDetail.classList.add('visible');
+            overlay.classList.add('visible');
+            escInstruction.classList.add('visible');
+            
+            // Disable body scroll
+            document.body.style.overflow = 'hidden';
+            
+            // Prefetch next image for faster navigation
+            prefetchNextImage(parseInt(imageElement.dataset.index));
+        }
+
+        // Prefetch next image for smoother navigation
+        function prefetchNextImage(currentIndex) {
+            const nextIndex = (currentIndex + 1) % state.totalImages;
+            const items = document.querySelectorAll('.image-item');
+            if (items[nextIndex]) {
+                const nextSrc = items[nextIndex].dataset.imageSrc;
+                const img = new Image();
+                img.src = nextSrc;
+            }
+        }
+
+        // Hide card detail view
+        function hideCardDetail() {
+            if (!state.isCardVisible) return;
+            
+            state.isCardVisible = false;
+            const cardDetail = document.getElementById('cardDetail');
+            const overlay = document.getElementById('overlay');
+            const escInstruction = document.getElementById('esc-instruction');
+            
+            cardDetail.classList.remove('visible');
+            overlay.classList.remove('visible');
+            escInstruction.classList.remove('visible');
+            
+            // Re-enable scrolling
+            document.body.style.overflow = '';
+            
+            // Clear current image
+            state.currentImageElement = null;
+        }
+
+        // Navigate to next or previous image
+        function navigateImage(direction) {
+            if (!state.currentImageElement) return;
+            
+            const currentIndex = parseInt(state.currentImageElement.dataset.index);
+            const items = document.querySelectorAll('.image-item');
+            let nextIndex;
+            
+            if (direction === 'next') {
+                nextIndex = (currentIndex + 1) % items.length;
+            } else {
+                nextIndex = (currentIndex - 1 + items.length) % items.length;
+            }
+            
+            if (items[nextIndex]) {
+                showCardDetail(items[nextIndex]);
+            }
+        }
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Close button for card detail
+            document.getElementById('closeButton').addEventListener('click', hideCardDetail);
+            
+            // Close card when clicking on overlay
+            document.getElementById('overlay').addEventListener('click', hideCardDetail);
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (state.isCardVisible) {
+                    if (e.key === 'Escape') {
+                        hideCardDetail();
+                    } else if (e.key === 'ArrowRight') {
+                        navigateImage('next');
+                    } else if (e.key === 'ArrowLeft') {
+                        navigateImage('prev');
+                    }
+                }
+            });
+            
+            // Touch event handling for mobile
+            let touchStartX = 0;
+            let touchStartY = 0;
+            
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+            
+            document.addEventListener('touchend', (e) => {
+                if (!state.isCardVisible) return;
+                
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+                
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                
+                // Detect horizontal swipe for navigation
+                if (Math.abs(deltaX) > 100 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                    if (deltaX > 0) {
+                        navigateImage('prev');
+                    } else {
+                        navigateImage('next');
+                    }
+                } 
+                // Detect vertical swipe down to close
+                else if (deltaY > 100 && Math.abs(deltaY) > Math.abs(deltaX)) {
+                    hideCardDetail();
+                }
+            });
+            
+            // Prevent context menu and default touch actions on images
+            document.querySelectorAll('.image-item img').forEach(img => {
+                img.addEventListener('contextmenu', e => e.preventDefault());
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', adjustLayoutForScreenSize);
+        }
+        
+        // Adjust layout based on screen size
+        function adjustLayoutForScreenSize() {
+            const cardDetail = document.getElementById('cardDetail');
+            
+            if (window.innerWidth <= 480) {
+                // Small mobile screens - full screen card
+                cardDetail.style.width = '100vw';
+                cardDetail.style.height = '100vh';
+                cardDetail.style.borderRadius = '0';
+                cardDetail.style.maxWidth = 'none';
+                cardDetail.style.maxHeight = 'none';
+            } else if (window.innerWidth < 768) {
+                // Medium screens
+                cardDetail.style.width = '90vw';
+                cardDetail.style.height = '85vh';
+                cardDetail.style.borderRadius = '10px';
+            } else {
+                // Larger screens
+                cardDetail.style.width = '80vw';
+                cardDetail.style.height = '80vh';
+                cardDetail.style.maxWidth = '900px';
+                cardDetail.style.maxHeight = '650px';
+                cardDetail.style.borderRadius = '10px';
+            }
+        }
+        
+        // Call initial screen size adjustment
+        adjustLayoutForScreenSize();
+    </script>
+</body>
+</html>
